@@ -29,9 +29,9 @@
           <ul class="nav navbar-nav navbar-right">
             <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/dashboard">Dashboard</a></li>
             <li><a href="#profile">Profile</a></li>
-            <li><a href="#profile">Sign in</a></li>
+            <li><a href="#signin">Sign in</a></li>
             <li><a href="#contact">Sign out</a></li>
-            <li><a href="#contact">Sign up</a></li>
+            <li [routerLinkActive]="['active']" [routerLinkActiveOptions]="{exact:true}"><a routerLink="/register">Sign up</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
