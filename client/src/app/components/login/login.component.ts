@@ -22,39 +22,40 @@ export class LoginComponent implements OnInit {
     this.createForm(); // Create Login Form when component is constructed
   }
 
-  // Function to create login form
+  // Create login form with form builder
   createForm() {
     this.form = this.formBuilder.group({
-      username: ['', Validators.required], // Username field
-      password: ['', Validators.required] // Password field
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
-  // Function to disable form
+  // Disable the form
   disableForm() {
-    this.form.controls['username'].disable(); // Disable username field
-    this.form.controls['password'].disable(); // Disable password field
+    this.form.controls['username'].disable();
+    this.form.controls['password'].disable();
   }
 
-  // Function to enable form
+  // Enable the form
   enableForm() {
-    this.form.controls['username'].enable(); // Enable username field
-    this.form.controls['password'].enable(); // Enable password field
+    this.form.controls['username'].enable();
+    this.form.controls['password'].enable();
   }
 
-  // Functiont to submit form and login user
+  // Submit form and login
   onLoginSubmit() {
-    this.processing = true; // Used to submit button while is being processed
-    this.disableForm(); // Disable form while being process
-    // Create user object from user's input
+    // Set to processing and disable form
+    this.processing = true;
+    this.disableForm();
+
+    // Create user object from input
     const user = {
       username: this.form.get('username').value, // Username input field
       password: this.form.get('password').value // Password input field
     }
 
-    // Function to send login data to API
+    // Send login data to API
     this.authService.login(user).subscribe(data => {
-      // Check if response was a success or error
       if (!data.success) {
          // Set error message
         this.messageClass = 'alert alert-danger';
@@ -70,8 +71,8 @@ export class LoginComponent implements OnInit {
         this.authService.storeUserData(data.token, data.user);
         // Redirect to dashboard page
         setTimeout(() => {
-          this.router.navigate(['/dashboard']); // Navigate to dashboard view
-        }, 2000);
+          this.router.navigate(['/dashboard']);
+        }, 1000);
       }
     });
   }

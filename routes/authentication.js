@@ -1,23 +1,23 @@
-const User = require('../models/user'); // Import User Model Schema
-const jwt = require('jsonwebtoken'); // Compact, URL-safe means of representing claims to be transferred between two parties.
-const config = require('../config/database'); // Import database configuration
+const User = require('../models/user');
+const jwt = require('jsonwebtoken');
+const config = require('../config/database');
 
 module.exports = (router) => {
-  /* ==============
-     Register Route
-  ============== */
+  // ==============
+  // Register user
+  // ==============
   router.post('/register', (req, res) => {
     // Check if email was provided
     if (!req.body.email) {
-      res.json({ success: false, message: 'You must provide an e-mail' }); // Return error
+      res.json({ success: false, message: 'You must provide an e-mail' });
     } else {
       // Check if username was provided
       if (!req.body.username) {
-        res.json({ success: false, message: 'You must provide a username' }); // Return error
+        res.json({ success: false, message: 'You must provide a username' });
       } else {
         // Check if password was provided
         if (!req.body.password) {
-          res.json({ success: false, message: 'You must provide a password' }); // Return error
+          res.json({ success: false, message: 'You must provide a password' });
         } else {
           // Create new user object and apply user input
           let user = new User({
@@ -27,7 +27,6 @@ module.exports = (router) => {
           });
           // Save user to database
           user.save((err) => {
-            // Check if error occured
             if (err) {
               // Check if error is an error indicating duplicate account
               if (err.code === 11000) {
@@ -64,13 +63,13 @@ module.exports = (router) => {
     }
   });
 
-  /* ============================================================
-     Route to check if user's email is available for registration
-  ============================================================ */
+  // ============================================================
+  //  Check if user's email is available for registration
+  // ============================================================
   router.get('/checkEmail/:email', (req, res) => {
     // Check if email was provided in paramaters
     if (!req.params.email) {
-      res.json({ success: false, message: 'E-mail was not provided' }); // Return error
+      res.json({ success: false, message: 'E-mail was not provided' });
     } else {
       // Search for user's e-mail in database;
       User.findOne({ email: req.params.email }, (err, user) => {
@@ -88,13 +87,13 @@ module.exports = (router) => {
     }
   });
 
-  /* ===============================================================
-     Route to check if user's username is available for registration
-  =============================================================== */
+  // =============================================================
+  //   Check if user's username is available for registration
+  // =============================================================
   router.get('/checkUsername/:username', (req, res) => {
     // Check if username was provided in paramaters
     if (!req.params.username) {
-      res.json({ success: false, message: 'Username was not provided' }); // Return error
+      res.json({ success: false, message: 'Username was not provided' });
     } else {
       // Look for username in database
       User.findOne({ username: req.params.username }, (err, user) => {
@@ -113,32 +112,31 @@ module.exports = (router) => {
     }
   });
 
-  /* ========
-  LOGIN ROUTE
-  ======== */
+  // ===================
+  //   Login for user
+  // ===================
   router.post('/login', (req, res) => {
     // Check if username was provided
     if (!req.body.username) {
-      res.json({ success: false, message: 'No username was provided' }); // Return error
+      res.json({ success: false, message: 'No username was provided' });
     } else {
       // Check if password was provided
       if (!req.body.password) {
-        res.json({ success: false, message: 'No password was provided.' }); // Return error
+        res.json({ success: false, message: 'No password was provided.' });
       } else {
         // Check if username exists in database
         User.findOne({ username: req.body.username.toLowerCase() }, (err, user) => {
-          // Check if error was found
           if (err) {
-            res.json({ success: false, message: err }); // Return error
+            res.json({ success: false, message: err });
           } else {
             // Check if username was found
             if (!user) {
-              res.json({ success: false, message: 'No username and password pair found.' }); // Return error
+              res.json({ success: false, message: 'No username and password pair found.' });
             } else {
               const validPassword = user.comparePassword(req.body.password); // Compare password provided to password in database
               // Check if password is a match
               if (!validPassword) {
-                res.json({ success: false, message: 'No username and password pair found.' }); // Return error
+                res.json({ success: false, message: 'No username and password pair found.' });
               } else {
                 const token = jwt.sign({ userId: user._id }, config.secret, { expiresIn: '24h' }); // Create a token for client
                 res.json({ success: true, message: 'Success!', token: token, user: { username: user.username } }); // Return success and token to frontend
@@ -150,14 +148,14 @@ module.exports = (router) => {
     }
   });
 
-  /* ================================================
-  MIDDLEWARE - Used to grab user's token from headers
-  ================================================ */
+  // ===================================================
+  // MIDDLEWARE - Used to grab user's token from headers
+  // ===================================================
   router.use((req, res, next) => {
     const token = req.headers['authorization']; // Create token found in headers
     // Check if token was found in headers
     if (!token) {
-      res.json({ success: false, message: 'No token provided' }); // Return error
+      res.json({ success: false, message: 'No token provided' });
     } else {
       // Verify the token is valid
       jwt.verify(token, config.secret, (err, decoded) => {
@@ -172,15 +170,15 @@ module.exports = (router) => {
     }
   });
 
-  /* ===============================================================
-     Route to get user's profile data
-  =============================================================== */
+  // ===============================================================
+  //   Get user's profile data
+  // ===============================================================
   router.get('/profile', (req, res) => {
     // Search for user in database
     User.findOne({ _id: req.decoded.userId }).select('username email').exec((err, user) => {
       // Check if error connecting
       if (err) {
-        res.json({ success: false, message: err }); // Return error
+        res.json({ success: false, message: err });
       } else {
         // Check if user was found in database
         if (!user) {

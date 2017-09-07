@@ -24,39 +24,35 @@ export class RegisterComponent implements OnInit {
     private authService: AuthService,
     private router: Router
   ) {
-    this.createForm(); // Create Angular 2 Form when component loads
+    this.createForm(); // Create Form on component load
   }
 
-  // Function to create registration form
+  // Create registration form
   createForm() {
     this.form = this.formBuilder.group({
-      // Email Input
       email: ['', Validators.compose([
-        Validators.required, // Field is required
-        Validators.minLength(5), // Minimum length is 5 characters
-        Validators.maxLength(30), // Maximum length is 30 characters
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(30),
         this.validateEmail // Custom validation
       ])],
-      // Username Input
       username: ['', Validators.compose([
-        Validators.required, // Field is required
-        Validators.minLength(3), // Minimum length is 3 characters
-        Validators.maxLength(15), // Maximum length is 15 characters
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(15),
         this.validateUsername // Custom validation
       ])],
-      // Password Input
       password: ['', Validators.compose([
-        Validators.required, // Field is required
-        Validators.minLength(8), // Minimum length is 8 characters
-        Validators.maxLength(35), // Maximum length is 35 characters
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(35),
         this.validatePassword // Custom validation
       ])],
-      // Confirm Password Input
-      confirm: ['', Validators.required] // Field is required
-    }, { validator: this.matchingPasswords('password', 'confirm') }); // Add custom validator to form for matching passwords
+      confirm: ['', Validators.required]
+    }, { validator: this.matchingPasswords('password', 'confirm') }); // Additional validator for matching passwords
   }
 
-  // Function to disable the registration form
+  // Disable the registration form
   disableForm() {
     this.form.controls['email'].disable();
     this.form.controls['username'].disable();
@@ -64,7 +60,7 @@ export class RegisterComponent implements OnInit {
     this.form.controls['confirm'].disable();
   }
 
-  // Function to enable the registration form
+  // Enable the registration form
   enableForm() {
     this.form.controls['email'].enable();
     this.form.controls['username'].enable();
@@ -72,9 +68,8 @@ export class RegisterComponent implements OnInit {
     this.form.controls['confirm'].enable();
   }
 
-  // Function to validate e-mail is proper format
+  // Validate e-mail is proper format
   validateEmail(controls) {
-    // Create a regular expression
     const regExp = new RegExp(/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
     // Test email against regular expression
     if (regExp.test(controls.value)) {
@@ -86,7 +81,6 @@ export class RegisterComponent implements OnInit {
 
   // Function to validate username is proper format
   validateUsername(controls) {
-    // Create a regular expression
     const regExp = new RegExp(/^[a-zA-Z0-9]+$/);
     // Test username against regular expression
     if (regExp.test(controls.value)) {
@@ -98,7 +92,6 @@ export class RegisterComponent implements OnInit {
 
   // Function to validate password
   validatePassword(controls) {
-    // Create a regular expression
     const regExp = new RegExp(/^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[\d])(?=.*?[\W]).{8,35}$/);
     // Test password against regular expression
     if (regExp.test(controls.value)) {
@@ -108,7 +101,7 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  // Funciton to ensure passwords match
+  // Ensure passwords match
   matchingPasswords(password, confirm) {
     return (group: FormGroup) => {
       // Check if both fields are the same
@@ -120,62 +113,64 @@ export class RegisterComponent implements OnInit {
     }
   }
 
-  // Function to submit form
+  // Submit form
   onRegisterSubmit() {
-    this.processing = true; // Used to notify HTML that form is in processing, so that it can be disabled
-    this.disableForm(); // Disable the form
-    // Create user object form user's inputs
+     // Set to processing and disable the form
+    this.processing = true;
+    this.disableForm();
+
+    // Create user object form inputs
     const user = {
-      email: this.form.get('email').value, // E-mail input field
-      username: this.form.get('username').value, // Username input field
-      password: this.form.get('password').value // Password input field
+      email: this.form.get('email').value,
+      username: this.form.get('username').value,
+      password: this.form.get('password').value
     }
 
-    // Function from authentication service to register user
+    // Authentication service to register user
     this.authService.registerUser(user).subscribe(data => {
-      // Response from registration attempt
       if (!data.success) {
-        this.messageClass = 'alert alert-danger'; // Set an error class
-        this.message = data.message; // Set an error message
-        this.processing = false; // Re-enable submit button
-        this.enableForm(); // Re-enable form
+        // Set an error message
+        this.messageClass = 'alert alert-danger';
+        this.message = data.message;
+         // Re-enable form and submit button
+        this.processing = false;
+        this.enableForm();
       } else {
-        this.messageClass = 'alert alert-success'; // Set a success class
-        this.message = data.message; // Set a success message
-        // After 2 second timeout, navigate to the login page
+        // Set a success message
+        this.messageClass = 'alert alert-success';
+        this.message = data.message;
+        // After timeout, navigate to the login page
         setTimeout(() => {
           this.router.navigate(['/login']); // Redirect to login view
-        }, 2000);
+        }, 1000);
       }
     });
 
   }
 
-  // Function to check if e-mail is taken
+  // Check if e-mail is taken
   checkEmail() {
-    // Function from authentication file to check if e-mail is taken
+    // Authentication file to check if e-mail is taken
     this.authService.checkEmail(this.form.get('email').value).subscribe(data => {
-      // Check if success true or false was returned from API
       if (!data.success) {
-        this.emailValid = false; // Return email as invalid
+        this.emailValid = false;
         this.emailMessage = data.message; // Return error message
       } else {
-        this.emailValid = true; // Return email as valid
+        this.emailValid = true;
         this.emailMessage = data.message; // Return success message
       }
     });
   }
 
-  // Function to check if username is available
+  // Check if username is available
   checkUsername() {
-    // Function from authentication file to check if username is taken
+    // Authentication file to check if username is taken
     this.authService.checkUsername(this.form.get('username').value).subscribe(data => {
-      // Check if success true or success false was returned from API
       if (!data.success) {
-        this.usernameValid = false; // Return username as invalid
+        this.usernameValid = false;
         this.usernameMessage = data.message; // Return error message
       } else {
-        this.usernameValid = true; // Return username as valid
+        this.usernameValid = true;
         this.usernameMessage = data.message; // Return success message
       }
     });
