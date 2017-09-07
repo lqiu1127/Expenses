@@ -3,8 +3,10 @@ import { NgModule } from '@angular/core';
 import { HomeComponent } from './components/home/home.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { RegisterComponent } from './components/register/register.component';
+import { LoginComponent } from './components/login/login.component';
+import { ProfileComponent } from './components/profile/profile.component';
 
-// Array of Angular Routes
+// Angular Routes
 const appRoutes: Routes = [
   {
     path: '',
@@ -17,6 +19,14 @@ const appRoutes: Routes = [
   {
     path: 'register',
     component: RegisterComponent // The Register Route
+  },
+  {
+    path: 'login',
+    component: LoginComponent // The Login Route
+  },  
+  {
+    path: 'profile',
+    component: ProfileComponent // The Profile Route
   },
   { path: '**', component: HomeComponent } // The "Catch-All" Route
 ];
